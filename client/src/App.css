@@ -1,75 +1,469 @@
-/* Navbar styles */
-.navbar {
-  background-color: #4CAF50;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+/* Reset & base styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.navbar-title {
-  margin: 0;
-  font-size: 1.5rem;
-  color: white;
-  font-weight: 600;
+:root {
+    --bg-gradient: radial-gradient(circle at top left, #1d2433 0, #070b12 55%, #020308 100%);
+    --card-bg: rgba(17, 24, 39, 0.9);
+    --card-border: rgba(148, 163, 184, 0.25);
+    --accent: #6366f1;
+    --accent-soft: rgba(99, 102, 241, 0.15);
+    --accent-strong: #4f46e5;
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --danger: #f97373;
+    --success: #22c55e;
+    --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.75);
+    --radius-lg: 1.25rem;
+    --radius-pill: 999px;
+    --transition-fast: 150ms ease-out;
+    --transition-med: 220ms ease-out;
+    --nav-height: 72px;
+    --content-max-width: 1120px;
+    --content-padding: 1.5rem;
+    --blur-amount: 18px;
+    --scrollbar-track: rgba(15, 23, 42, 0.8);
+    --scrollbar-thumb: rgba(55, 65, 81, 0.9);
+    --scrollbar-thumb-hover: rgba(75, 85, 99, 1);
 }
 
-/* Main content area */
-.main-content {
-  padding: 2rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.app-container {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-}
-
-/* Original styles */
+html,
+body,
 #root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
+    height: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Scrollbar styling (for supported browsers) */
+body::-webkit-scrollbar {
+    width: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+body::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
 }
 
-.card {
-  padding: 2em;
+body::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
 }
 
-.read-the-docs {
-  color: #888;
+body::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Main app layout */
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* remove side padding so content can go edge-to-edge; keep top/bottom spacing */
+    padding: 1.5rem 0 2.5rem;
+    background: var(--bg-gradient);
+}
+
+/* NAVBAR */
+.navbar {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 20;
+    width: 100vw; /* span full viewport width */
+    margin: 0 auto 1.75rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0; /* full-width bar look; remove pill at edges */
+    background: linear-gradient(
+            120deg,
+            rgba(99, 102, 241, 0.12),
+            rgba(15, 23, 42, 0.85),
+            rgba(15, 23, 42, 0.95)
+    );
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(var(--blur-amount));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+}
+
+/* Title */
+.navbar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.navbar-title::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: radial-gradient(circle, #22c55e 0, #16a34a 40%, #14532d 100%);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18), 0 0 18px rgba(34, 197, 94, 0.9);
+}
+
+/* Navbar buttons */
+.navbar-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.navbar-buttons a {
+    text-decoration: none;
+}
+
+/* Base button style */
+.navbar-buttons button {
+    position: relative;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    background: rgba(15, 23, 42, 0.55);
+    color: var(--text-secondary);
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition:
+            background var(--transition-fast),
+            border-color var(--transition-fast),
+            color var(--transition-fast),
+            transform var(--transition-fast),
+            box-shadow var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    backdrop-filter: blur(12px);
+}
+
+.navbar-buttons button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(circle at top center, rgba(255, 255, 255, 0.18), transparent 60%);
+    transition: opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+.navbar-buttons button:hover {
+    background: rgba(31, 41, 55, 0.9);
+    color: var(--text-primary);
+    border-color: rgba(209, 213, 219, 0.8);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.65);
+}
+
+.navbar-buttons button:hover::after {
+    opacity: 1;
+}
+
+.navbar-buttons button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.8);
+}
+
+/* Connect wallet button */
+.connect-button {
+    border-color: rgba(129, 140, 248, 0.9) !important;
+    background: linear-gradient(
+            120deg,
+            rgba(79, 70, 229, 0.18),
+            rgba(15, 23, 42, 0.9),
+            rgba(37, 99, 235, 0.25)
+    )
+    border-box !important;
+    color: #e5e7eb !important;
+    font-weight: 500;
+    padding-inline: 1rem !important;
+}
+
+.connect-button:hover {
+    background: linear-gradient(
+            120deg,
+            rgba(79, 70, 229, 0.35),
+            rgba(15, 23, 42, 0.9),
+            rgba(37, 99, 235, 0.4)
+    )
+    border-box !important;
+    border-color: rgba(191, 219, 254, 0.95) !important;
+    box-shadow:
+            0 12px 30px rgba(37, 99, 235, 0.7),
+            0 0 0 1px rgba(129, 140, 248, 0.6);
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+    width: 100vw; /* full viewport width */
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Card where routed pages render */
+.main-content > * {
+    width: 100vw; /* make the card itself full-width */
+    max-width: none; /* no cap */
+    margin: 0; /* no side margin */
+    background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.85), rgba(3, 7, 18, 0.94));
+    border-radius: 0; /* full-bleed card */
+    border: none; /* optional: remove border so it blends with background */
+    box-shadow: none; /* optional: remove shadow for flat full-screen feel */
+    padding: var(--content-padding) 2rem 2rem; /* inner padding left/right */
+    color: var(--text-primary);
+    backdrop-filter: blur(var(--blur-amount));
+    position: relative;
+    overflow: hidden;
+}
+
+/* On very small screens reduce horizontal padding for space */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem 0 1.75rem;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.75rem 1rem 0.9rem;
+    }
+
+    .main-content > * {
+        padding: 1.1rem 1rem 1.5rem;
+    }
+}
+
+/* Small tweak: on very wide screens keep the card visually centered by adding left-right margin */
+@media (min-width: 1400px) {
+    .main-content > * {
+        margin: 0 3rem; /* create balanced spacing on very wide viewports */
+    }
+}
+
+/* Subtle glow in content card */
+.main-content > *::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background:
+            radial-gradient(circle at top left, rgba(96, 165, 250, 0.12), transparent 60%),
+            radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.14), transparent 65%);
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+/* Forms / common elements inside routed components */
+.main-content h1,
+.main-content h2,
+.main-content h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.main-content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.main-content p,
+.main-content label,
+.main-content span {
+    color: var(--text-secondary);
+}
+
+/* Input, select, textarea base style */
+.main-content input,
+.main-content select,
+.main-content textarea {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--text-primary);
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    outline: none;
+    transition:
+            border-color var(--transition-med),
+            box-shadow var(--transition-med),
+            background var(--transition-med),
+            transform var(--transition-fast);
+}
+
+.main-content input::placeholder,
+.main-content textarea::placeholder {
+    color: rgba(148, 163, 184, 0.75);
+}
+
+.main-content input:focus,
+.main-content select:focus,
+.main-content textarea:focus {
+    border-color: rgba(129, 140, 248, 0.95);
+    box-shadow:
+            0 0 0 1px rgba(129, 140, 248, 0.7),
+            0 10px 30px rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 1);
+    transform: translateY(-1px);
+}
+
+/* General button style inside forms */
+.main-content button {
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    background: linear-gradient(135deg, #4f46e5, #2563eb);
+    color: #e5e7eb;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition:
+            transform var(--transition-fast),
+            box-shadow var(--transition-fast),
+            filter var(--transition-fast),
+            border-color var(--transition-fast);
+    box-shadow:
+            0 12px 30px rgba(37, 99, 235, 0.65),
+            0 0 0 1px rgba(59, 130, 246, 0.7);
+}
+
+.main-content button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow:
+            0 16px 40px rgba(37, 99, 235, 0.9),
+            0 0 0 1px rgba(191, 219, 254, 1);
+}
+
+.main-content button:active {
+    transform: translateY(0);
+    box-shadow:
+            0 10px 25px rgba(37, 99, 235, 0.8),
+            0 0 0 1px rgba(129, 140, 248, 0.9);
+}
+
+/* Helper: sections in forms */
+.form-section {
+    margin-bottom: 1.1rem;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.form-row > * {
+    flex: 1 1 220px;
+}
+
+/* Badges & status labels */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background: rgba(22, 163, 74, 0.18);
+    color: #bbf7d0;
+    border: 1px solid rgba(74, 222, 128, 0.6);
+}
+
+.badge-danger {
+    background: rgba(220, 38, 38, 0.16);
+    color: #fecaca;
+    border: 1px solid rgba(248, 113, 113, 0.65);
+}
+
+/* Links inside content */
+.main-content a {
+    color: #93c5fd;
+    text-decoration: none;
+}
+
+.main-content a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-container {
+        padding-inline: 0.75rem;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 1.25rem;
+        padding: 0.75rem 1rem 0.9rem;
+    }
+
+    .navbar-title {
+        font-size: 1rem;
+    }
+
+    .navbar-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .navbar-buttons button {
+        font-size: 0.8rem;
+        padding: 0.45rem 0.8rem;
+    }
+
+    .main-content > * {
+        padding: 1.1rem 1rem 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        top: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .navbar-title {
+        width: 100%;
+    }
+
+    .navbar-buttons {
+        gap: 0.4rem;
+    }
+
+    .navbar-buttons button {
+        flex: 1 1 calc(50% - 0.4rem);
+        justify-content: center;
+    }
 }
