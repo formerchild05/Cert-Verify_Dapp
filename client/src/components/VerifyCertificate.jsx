@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getContract } from "../utils/contract";
+import { getContract } from "../utils/Contract";
 import { ethers } from "ethers";
 
 export default function VerifyCertificate() {

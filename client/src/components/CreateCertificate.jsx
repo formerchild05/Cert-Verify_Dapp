@@ -1,75 +1,108 @@
-import { useState } from "react";
-import { getContract } from "../utils/contract";
-import { ethers } from "ethers";
+import React, { useState } from 'react';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { saveAs } from 'file-saver';
+import fontkit from '@pdf-lib/fontkit';
+import { Upload } from '../utils/Ipfs';
+import { issueNewCertificate } from '../utils/contract';
 
 export default function CreateCertificate() {
-  const [form, setForm] = useState({
-    id: "",
-    data: "",
-    issuedTo: "",
-    expireAt: "", // nhập dạng "YYYY-MM-DD"
-  });
+  const [org, setOrg] = useState('My Organization'); // Tên tổ chức
+  const [expireDate, setExpireDate] = useState('2024-06-01');
+  const [candidate, setCandidate] = useState('Jane Smith'); // Tên người nhận
+  const [course, setCourse] = useState('Blockchain 101'); // Tên khóa học
+  const [candidateId, setCandidateId] = useState(); // public key của người nhận
+  const [id, setId] = useState(); // ID của chứng chỉ
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
-  const createCert = async () => {
+
+  const drawOnPdf = async () => {
+    setIsLoading(true);
+
     try {
-      const contract = await getContract();
+      // 1. Tải file PDF template
+      const formUrl = '/certificate_template.pdf';
+      const formPdfBytes = await fetch(formUrl).then(res => res.arrayBuffer());
 
-      // convert sang bytes32
-      const idBytes = ethers.encodeBytes32String(form.id);
-      const dataHash = ethers.keccak256(ethers.toUtf8Bytes(form.data));
-      const expireAt = form.expireAt
-        ? Math.floor(new Date(form.expireAt).getTime() / 1000)
-        : 0;
+      // 2. Load file PDF
+      const pdfDoc = await PDFDocument.load(formPdfBytes);
 
-      const tx = await contract.create(
-        idBytes,
-        dataHash,
-        form.issuedTo,
-        expireAt
-      );
-      await tx.wait();
-      alert("✅ Certificate created successfully!");
+      pdfDoc.registerFontkit(fontkit);
+      // 3. Lấy trang mà bạn muốn vẽ đè lên (ví dụ: trang đầu tiên)
+      const firstPage = pdfDoc.getPages()[0]; // Lấy trang đầu tiên
+      const { width, height } = firstPage.getSize(); // Lấy kích thước trang
+
+      const fontUrl = '/font/BeVietnamPro-Regular.ttf'; // Dùng font đậm cho tên
+      const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+      const customFont = await pdfDoc.embedFont(fontBytes);
+
+      // --- 5. Vẽ ĐÈ VĂN BẢN ---
+      // Gốc tọa độ (0,0) của PDF là ở góc dưới bên trái.
+      // Để dễ hình dung, bạn có thể coi Y là khoảng cách từ đáy lên.
+      const yguess = (height / 2) - 50;
+      // Vẽ dòng chữ "Đã duyệt"
+      firstPage.drawText(candidate, {
+        x: width / 2 - 50,
+        y: yguess,
+        font: customFont,
+        size: 24,
+        color: rgb(0.1, 0.1, 0.1)
+      });
+
+
+
+      // 8. Lưu file PDF đã được sửa
+      const pdfBytes = await pdfDoc.save();
+
+      // 9. Tải file về máy người dùng
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      saveAs(blob, 'file-da-ve-de.pdf');
+
+      // 10. Upload lên IPFS
+      const cid = await Upload({ file: blob });
+      console.log('CID của file PDF đã vẽ đè:', cid);
+      alert('File PDF đã vẽ đè được tải về và upload lên IPFS với CID: ' + cid);
+
+      // 11. Blockchain (CID)
+      const Chain = await issueNewCertificate(id, cid, candidateId, expireDate);
+      console.log('Chứng chỉ đã được phát hành trên blockchain:', Chain);
+
     } catch (err) {
-      console.error(err);
-      alert("❌ Error creating certificate!");
+      console.error('Lỗi :', err);
+      alert('Đã xảy ra lỗi . Vui lòng kiểm tra console.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Create Certificate</h2>
-      <input
-        name="id"
-        placeholder="Certificate ID"
-        value={form.id}
-        onChange={handleChange}
-      />
-      <input
-        name="data"
-        placeholder="Certificate Data"
-        value={form.data}
-        onChange={handleChange}
-      />
-      <input
-        name="issuedTo"
-        placeholder="Issued To Address"
-        value={form.issuedTo}
-        onChange={handleChange}
-      />
-      <input
-        type="date"
-        name="expireAt"
-        placeholder="Expiry Date"
-        value={form.expireAt}
-        onChange={handleChange}
-      />
-      <button onClick={createCert} style={{ marginTop: 10 }}>
-        Create
+    <div>
+      <h3>Issue new Certificate</h3>
+      <div>
+        <label>CANDIDATE</label>
+        <input
+          type="text"
+          value={candidate}
+          onChange={(e) => setCandidate(e.target.value)}
+        />
+      </div>
+
+
+      {/* TODO : ADD COURSE NAME, DATE, ORG*/}
+      <label>CERTIFICATE ID</label>
+      <input type="text" value={id} onChange={(e) => setId(e.target.value)} />
+      <label>COURSE</label>
+      <input type="text" value={course} onChange={(e) => setCourse(e.target.value)} />
+      <label>EXPIRE DATE</label>
+      <input type="date" value={expireDate} onChange={(e) => setExpireDate(e.target.value)} />
+      <label>ORGANIZATION</label>
+      <input type="text" value={org} onChange={(e) => setOrg(e.target.value)} />
+      <label>CANDIDATE ID (Public Key)</label>
+      <input type="text" value={candidateId} onChange={(e) => setCandidateId(e.target.value)} />
+
+      <button onClick={drawOnPdf} disabled={isLoading}>
+        {isLoading ? 'Đang xử lý...' : 'Vẽ đè và Tải PDF'}
       </button>
     </div>
   );
-}
+};

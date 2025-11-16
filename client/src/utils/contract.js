@@ -1,62 +1,79 @@
-import { ethers }from "ethers";
+import { ethers } from "ethers";
 import abi from "../abi/CertificateContract.json";
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // địa chỉ contract của bạn
+const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-// Ensure MetaMask is on the local Hardhat chain (chainId 31337) before returning the contract.
 export async function getContract() {
   if (!window.ethereum) throw new Error("MetaMask not installed!");
 
-  const desiredChainId = "0x7A69"; // 31337 in hex
+  const desiredChainId = "0x7A69"; // Hardhat chain ID (31337)
 
+  // --- Switch network ---
   try {
-    // Request MetaMask to switch to the desired chain
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: desiredChainId }],
     });
   } catch (switchError) {
-    // 4902: the chain is not added to MetaMask
-    // Some providers may return different codes/messages, so try add if switch failed
     try {
-      if (
-        switchError.code === 4902 ||
-        switchError.code === -32603 ||
-        (switchError.message && switchError.message.toLowerCase().includes("unrecognized chain"))
-      ) {
+      if (switchError.code === 4902) {
         await window.ethereum.request({
           method: "wallet_addEthereumChain",
           params: [
             {
               chainId: desiredChainId,
               chainName: "Hardhat Localhost",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
               rpcUrls: ["http://127.0.0.1:8545"],
-              blockExplorerUrls: [],
+              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
             },
           ],
         });
-        // After adding, try switching again
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: desiredChainId }],
-        });
-      } else if (switchError.code === 4001) {
-        // User rejected the request
-        throw new Error("User rejected network switch");
-      } else {
-        console.warn("Failed to switch network:", switchError);
       }
     } catch (addError) {
-      // If adding also failed, surface a meaningful error
-      console.error("Error adding/switching network:", addError);
+      console.error("Network switch/add error:", addError);
       throw addError;
     }
   }
 
-  // Create provider and contract instance
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const signer = await provider.getSigner();
+  // --- ethers v5: Web3Provider ---
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+
+  // --- ethers v5: ABI nằm trực tiếp trong JSON ---
   const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
+
   return contract;
+}
+
+/**
+ * issue new certificate on blockchain
+ * @param {*} id 
+ * @param {*} dataHash 
+ * @param {*} issuedTo 
+ * @param {*} expireAt 
+ * @returns 
+ */
+export async function issueNewCertificate(id, dataHash, issuedTo, expireAt) {
+  const contract = await getContract();
+
+  const Bid = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(id)); // bytes32
+  const BdataHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(dataHash)); // bytes32
+  const BexpireAt = expireAt
+    ? Math.floor(new Date(expireAt).getTime() / 1000)
+    : 0;
+
+  const tx = await contract.create(Bid, BdataHash, issuedTo, BexpireAt);
+  const receipt = await tx.wait();
+  return receipt;
+}
+
+/**
+ * add candidate to organization
+ * @param {*} candidate (public key)
+ */
+export async function addCandToOrg(candidate) {
+  const contract = await getContract();
+  const tx = await contract.addUser(candidate);
+  const receipt = await tx.wait();
+  return receipt;
 }
