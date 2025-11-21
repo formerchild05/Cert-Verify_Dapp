@@ -5,6 +5,10 @@ const local = create({ url: "http://127.0.0.1:5001/api/v0" });
 
 
 export async function Upload({ file }) {
+    if (!file) {
+        alert("No file provided for IPFS upload");
+        throw new Error("No file provided for IPFS upload");
+    }
     try {
         const added = await local.add(file, { pin: true });
         alert("Upload successful! CID: " + added.path);

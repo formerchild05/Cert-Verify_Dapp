@@ -29,6 +29,7 @@ contract CertificateContract is Ownable {
     // Danh sách cert theo user
     mapping(address => bytes32[]) public userCertificates;
 
+
     // Admin thêm org issuer
     function setIssuer(address _issuer, bool _allowed) external onlyOwner {
         isIssuer[_issuer] = _allowed;
@@ -76,14 +77,16 @@ contract CertificateContract is Ownable {
     function revoke(bytes32 id) external {
         Certificate memory c = certificates[id];
 
-        require(c.createdAt != 0, "Certificate does not exist");
-        require(!isRevoked[id], "Already revoked");
-
         // Chỉ người cấp hoặc admin
         require(
             msg.sender == c.issuedBy || msg.sender == owner(),
-            "Not authorized"
+            "Not authorized to revoke"
         );
+
+        require(c.createdAt != 0, "Certificate does not exist");
+        require(!isRevoked[id], "Already revoked");
+
+
 
         isRevoked[id] = true;
 
@@ -108,5 +111,19 @@ contract CertificateContract is Ownable {
         returns (bytes32[] memory)
     {
         return userCertificates[user];
+    }
+
+    /**
+    check is an admin
+     */
+    function isAdmin(address user) external view returns (bool) {
+        return user == owner();
+    }
+
+    /**
+    check is an org issuer
+     */
+    function isOrgIssuer(address user) external view returns (bool) {
+        return isIssuer[user];
     }
 }

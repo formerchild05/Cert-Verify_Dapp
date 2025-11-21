@@ -77,3 +77,32 @@ export async function addCandToOrg(candidate) {
   const receipt = await tx.wait();
   return receipt;
 }
+
+/**
+ * verify certificate using cert id and CID(hash)
+ * @param {*} id 
+ * @param {*} cid 
+ */
+export async function verifyCertificate(id, cid) {
+  const contract = await getContract();
+
+  const Bid = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(id)); // bytes32
+  const BdataHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(cid)); // bytes32
+
+  const result = await contract.verify(Bid, BdataHash);
+  return result;
+}
+
+/**
+ * revoke certificate by cert id
+ * @param {*} id 
+ * @returns 
+ */
+export async function revokeCertificate(id) {
+  const contract = await getContract();
+  const Bid = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(id)); // bytes32
+
+  const tx = await contract.revoke(Bid);
+  const receipt = await tx.wait();
+  return receipt;
+}

@@ -3,7 +3,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { saveAs } from 'file-saver';
 import fontkit from '@pdf-lib/fontkit';
 import { Upload } from '../utils/Ipfs';
-import { issueNewCertificate } from '../utils/contract';
+import { issueNewCertificate } from '../utils/Contract';
 
 export default function CreateCertificate() {
   const [org, setOrg] = useState('My Organization'); // Tên tổ chức
@@ -40,7 +40,6 @@ export default function CreateCertificate() {
       // Gốc tọa độ (0,0) của PDF là ở góc dưới bên trái.
       // Để dễ hình dung, bạn có thể coi Y là khoảng cách từ đáy lên.
       const yguess = (height / 2) - 50;
-      // Vẽ dòng chữ "Đã duyệt"
       firstPage.drawText(candidate, {
         x: width / 2 - 50,
         y: yguess,
@@ -49,16 +48,11 @@ export default function CreateCertificate() {
         color: rgb(0.1, 0.1, 0.1)
       });
 
-
-
       // 8. Lưu file PDF đã được sửa
       const pdfBytes = await pdfDoc.save();
 
-      // 9. Tải file về máy người dùng
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      saveAs(blob, 'file-da-ve-de.pdf');
-
       // 10. Upload lên IPFS
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const cid = await Upload({ file: blob });
       console.log('CID của file PDF đã vẽ đè:', cid);
       alert('File PDF đã vẽ đè được tải về và upload lên IPFS với CID: ' + cid);
@@ -66,6 +60,10 @@ export default function CreateCertificate() {
       // 11. Blockchain (CID)
       const Chain = await issueNewCertificate(id, cid, candidateId, expireDate);
       console.log('Chứng chỉ đã được phát hành trên blockchain:', Chain);
+
+      // 9. Tải file về máy người dùng
+
+      saveAs(blob, 'file-da-ve-de.pdf');
 
     } catch (err) {
       console.error('Lỗi :', err);

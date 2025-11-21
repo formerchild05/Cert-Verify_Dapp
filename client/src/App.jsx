@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import VerifyCertificate from "./components/VerifyCertificate";
-import UploadCertificate from "./components/UploadCertificate";
-import FetchCertificate from "./components/FetchCertificate";
 import MyCertificates from "./components/FCerti";
 import SetIssuer from "./components/SetIssuer";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
@@ -12,23 +10,12 @@ import Organization from "./components/Organization";
 function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
 
-  // optional: check if already connected on load
   useEffect(() => {
-    const checkWalletIsConnected = async () => {
-      if (!window.ethereum) return;
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_accounts",
-        });
-        if (accounts && accounts.length > 0) {
-          setCurrentAccount(accounts[0]);
-        }
-      } catch (err) {
-        console.error("Error checking accounts:", err);
-      }
-    };
+    if (!window.ethereum) return;
 
-    checkWalletIsConnected();
+    window.ethereum.on("accountsChanged", (accounts) => {
+      setCurrentAccount(accounts[0] || null);
+    });
   }, []);
 
   const connectWallet = async () => {
@@ -41,9 +28,9 @@ function App() {
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-      if (accounts && accounts.length > 0) {
-        setCurrentAccount(accounts[0]);
-      }
+      const current = accounts[0];
+      console.log("Current MetaMask wallet:", current);
+      setCurrentAccount(current);
     } catch (err) {
       console.error("Error connecting wallet:", err);
     }
@@ -95,7 +82,6 @@ function App() {
             <Route path="/setIssuer" element={<SetIssuer />} />
             {/* FOR ORG ADD NEW CANDIDATE */}
             <Route path="/organization" element={<Organization />} />
-            <Route path="*" element={<UploadCertificate />} />
           </Routes>
         </main>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addCandToOrg } from "../utils/contract";
+import { addCandToOrg } from "../utils/Contract";
 export default function Organization() {
     const [candidate, setCandidate] = useState('');
 
