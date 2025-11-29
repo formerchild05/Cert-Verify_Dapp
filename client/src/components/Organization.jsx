@@ -16,7 +16,7 @@ const addCandidate = () => {
 
   return (
     <div>
-        <label>add new candidate</label>
+        <h2>add new candidate</h2>
         <input type="text" value={candidate} onChange={(e) => setCandidate(e.target.value)} />
         <button onClick={addCandidate}>Add Candidate</button>
     </div>

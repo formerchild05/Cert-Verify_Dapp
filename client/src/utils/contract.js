@@ -106,3 +106,28 @@ export async function revokeCertificate(id) {
   const receipt = await tx.wait();
   return receipt;
 }
+
+/**
+ * set issuer in smart contract using public key (ONLY OWNER CAN SET ISSUER)
+ * @param {*} issuerAddress 
+ * @param {*} status 
+ * @returns 
+ */
+export async function setIssuer(issuerAddress, status) {
+  const contract = await getContract();
+  const tx = await contract.setIssuer(issuerAddress, status);
+  const receipt = await tx.wait();
+  return receipt;
+}
+
+export async function isIssuer(address) {
+  const contract = await getContract();
+  const result = await contract.isOrgIssuer(address);
+  return result;
+}
+
+export async function isOwner(address) {
+  const contract = await getContract();
+  const result = await contract.isAdmin(address);
+  return result;
+}

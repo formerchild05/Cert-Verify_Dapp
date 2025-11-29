@@ -74,12 +74,13 @@ function App() {
 
         <main className="main-content">
           <Routes>
+            <Route path="/" element={<VerifyCertificate />} />
             <Route path="/issue" element={<CreateCertificate />} />
             <Route path="/verify" element={<VerifyCertificate />} />
             <Route path="/test" element={<MyCertificates />} />
 
             {/* FOR ADMIN (DEPLOYER) */}
-            <Route path="/setIssuer" element={<SetIssuer />} />
+            <Route path="/setIssuer" element={<SetIssuer currentAccount={currentAccount} />} />
             {/* FOR ORG ADD NEW CANDIDATE */}
             <Route path="/organization" element={<Organization />} />
           </Routes>

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { useState } from "react";
-import { getContract } from "../utils/Contract";
+import { getContract, setIssuer, isIssuer, isOwner } from "../utils/Contract";
 
 
 /**
@@ -8,37 +8,49 @@ import { getContract } from "../utils/Contract";
  * using public key
  * @returns 
  */
-export default function SetIssuer() {
-    const [issuer, setIssuer] = useState("");
-    
+export default function SetIssuer({currentAccount}) {
+    const [issuerAdr, setIssuerAdr] = useState("");
+
     const handleIssuer = async () => {
-        if(typeof window.ethereum === 'undefined') {
+        if (typeof window.ethereum === 'undefined') {
             alert("MetaMask not found. Please install MetaMask.");
             return;
         }
 
-        try {
-    const contract = await getContract();
+        if (await isOwner(currentAccount) === false) {
+            alert("Only admin can set issuer.");
+            return;
+        }
 
-            const tx = await contract.setIssuer(issuer, true);
-            
-            console.log("Transaction sent. Waiting for confirmation...", tx.hash);
-            const block = await tx.wait();
-            console.log("Issuer set successfully:", issuer);
-            console.log
+        if (issuerAdr.trim() === "") {
+            alert("Please enter a valid issuer address.");
+            return;
+        }
+
+        if (await isIssuer(issuerAdr)) {
+            alert("This address is already an issuer.");
+            return;
+        }
+
+
+
+        try {
+            const receipt = await setIssuer(issuerAdr, true);
+            console.log(`Issuer set successfully at block number ${receipt.blockNumber}:`, receipt.blockHash);
+
         } catch (err) {
             console.error("Set issuer error:", err);
         }
     };
     return (
         <div>
+            <h2>Set Issuer</h2>
             <input
                 type="text"
                 placeholder="Issuer Address"
-                value={issuer}
-                onChange={(e) => setIssuer(e.target.value)}
+                value={issuerAdr}
+                onChange={(e) => setIssuerAdr(e.target.value)}
             />
-
             <button onClick={handleIssuer}>Set Issuer</button>
         </div>
     );
