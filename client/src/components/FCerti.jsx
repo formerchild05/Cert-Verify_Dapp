@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ethers } from "ethers";
 import abi from "../abi/CertificateContract.json";
+import { isIssuer } from "../utils/Contract";
+
 
 const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // đổi thành contract của bạn
 
@@ -49,12 +51,23 @@ export default function FCerti() {
     }
   };
 
+
+
+  const check = async () => {
+    try {
+      const issuer = await isIssuer();
+      alert(`Bạn ${issuer ? "là" : "không phải"} người phát hành chứng chỉ.`);
+    } catch (err) {
+      console.error("Check error:", err);
+    }
+  };
+
   return (
     <div>
       <h2>My Certificates</h2>
-      <button onClick={load}>Load</button>
+      <button onClick={check}>Load</button>
 
-      <ul>
+      {/* <ul>
         {certs.map((c, i) => (
           <li key={i}>
             <strong>ID:</strong> {c.id} <br />
@@ -65,7 +78,7 @@ export default function FCerti() {
             <hr />
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 }

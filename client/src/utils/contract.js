@@ -120,14 +120,33 @@ export async function setIssuer(issuerAddress, status) {
   return receipt;
 }
 
-export async function isIssuer(address) {
+export async function isIssuer() {
   const contract = await getContract();
-  const result = await contract.isOrgIssuer(address);
+  const result = await contract.isOrgIssuer();
   return result;
 }
 
-export async function isOwner(address) {
+export async function isOwner() {
   const contract = await getContract();
-  const result = await contract.isAdmin(address);
+  const result = await contract.isAdmin();
   return result;
+}
+
+export async function getAllIssuers() {
+  const contract = await getContract();
+  const issuers = await contract.getAllIssuers();
+  return issuers;
+}
+
+export async function getOrgUsers() {
+  const contract = await getContract();
+  const users = await contract.getOrgUsers();
+  return users;
+}
+
+export async function revokeUserFromOrg(userAddress) {
+  const contract = await getContract();
+  const tx = await contract.revokeUser(userAddress);
+  const receipt = await tx.wait();
+  return receipt;
 }

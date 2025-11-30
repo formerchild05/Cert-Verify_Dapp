@@ -3,7 +3,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { saveAs } from 'file-saver';
 import fontkit from '@pdf-lib/fontkit';
 import { Upload } from '../utils/Ipfs';
-import { issueNewCertificate } from '../utils/Contract';
+import { issueNewCertificate, isIssuer } from '../utils/Contract';
 
 export default function CreateCertificate() {
   const [org, setOrg] = useState('My Organization'); // Tên tổ chức
@@ -20,6 +20,13 @@ export default function CreateCertificate() {
     setIsLoading(true);
 
     try {
+      const check = await isIssuer();
+      if (!check) {
+        alert('Bạn không có quyền phát hành chứng chỉ từ tổ chức này.');
+        setIsLoading(false);
+        return;
+      }
+
       // 1. Tải file PDF template
       const formUrl = '/certificate_template.pdf';
       const formPdfBytes = await fetch(formUrl).then(res => res.arrayBuffer());
@@ -62,7 +69,6 @@ export default function CreateCertificate() {
       console.log('Chứng chỉ đã được phát hành trên blockchain:', Chain);
 
       // 9. Tải file về máy người dùng
-
       saveAs(blob, 'file-da-ve-de.pdf');
 
     } catch (err) {
