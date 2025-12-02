@@ -161,4 +161,5 @@ contract CertificateContract is Ownable {
         require(isIssuer[msg.sender], "no permission");
         return orgUserList[msg.sender];
     }
+    
 }

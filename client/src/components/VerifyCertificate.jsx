@@ -9,6 +9,10 @@ export default function VerifyCertificate() {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
 
+  const [certUrl, setCertUrl] = useState("");
+
+  const baseUrl = "https://ipfs.io/ipfs/";
+
   const Verify = async () => {
 
     console.log("Verifying certificate ID:", id, "with file:", file);
@@ -18,6 +22,11 @@ export default function VerifyCertificate() {
     const verifyResult = await verifyCertificate(id, cid);
 
     setResult(verifyResult);
+
+    if (verifyResult) {
+      setCertUrl(baseUrl + cid);
+    }
+
     console.log("Verification result:", verifyResult);
   }
 
@@ -36,6 +45,11 @@ export default function VerifyCertificate() {
               : <p style={{ color: "red" }}>Certificate is NOT VERIFIED!</p>
           )}
         </div>
+        {certUrl && (
+          <div>
+            <a href={certUrl} target="_blank" rel="noopener noreferrer">View Certificate PDF</a>
+          </div>
+        )}
     </div>
   );
 }

@@ -7,6 +7,8 @@ import "./App.css";
 import CreateCertificate from "./components/CreateCertificate";
 import Organization from "./components/Organization";
 import { isIssuer, isOwner } from "./utils/Contract";
+import RevokeCertificate from "./components/Revoke";
+
 function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
 
@@ -14,8 +16,6 @@ function App() {
 
   useEffect(() => {
     if (!window.ethereum) return;
-
-
 
     // check role
     const checkRole = async () => {
@@ -60,11 +60,11 @@ function App() {
   const content = () => {
     if (role === 'owner') {
       return <div>
-        <Link to="/issue"><button>Issue</button></Link>
+        <Link to="/certificate"><button>Certificate</button></Link>
         <Link to="/verify"><button>Verify</button></Link>
-        <Link to="/test"><button>Test</button></Link>
         <Link to="/setIssuer"><button>Set Issuer</button></Link>
         <Link to="/organization"><button>Organization</button></Link>
+
       </div>;
     } else if (role === 'issuer') {
       return <div>
@@ -84,20 +84,9 @@ function App() {
       <div className="app-container">
         <nav className="navbar">
           <h1 className="navbar-title">Blockchain Certificate DApp</h1>
-
           <div className="navbar-buttons">
 
             {content()}
-
-{/* 
-            <Link to="/issue"><button>Issue</button></Link>
-            <Link to="/verify"><button>Verify</button></Link>
-
-            <Link to="/test"><button>Test</button></Link>
-
-            <Link to="/setIssuer"><button>Set Issuer</button></Link>
-
-            <Link to="/organization"><button>Organization</button></Link> */}
 
             {/* Connect MetaMask button */}
             <button onClick={connectWallet} className="connect-button">
@@ -111,10 +100,10 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<VerifyCertificate />} />
-            <Route path="/issue" element={<CreateCertificate />} />
+            <Route path="/certificate" element={<CreateCertificate />} />
             <Route path="/verify" element={<VerifyCertificate />} />
             <Route path="/test" element={<MyCertificates />} />
-
+            <Route path="/revoke" element={<RevokeCertificate />} />
             {/* FOR ADMIN (DEPLOYER) */}
             <Route path="/setIssuer" element={<SetIssuer currentAccount={currentAccount} />} />
             {/* FOR ORG ADD NEW CANDIDATE */}

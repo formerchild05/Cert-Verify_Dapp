@@ -102,7 +102,7 @@ export async function revokeCertificate(id) {
   const contract = await getContract();
   const Bid = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(id)); // bytes32
 
-  const tx = await contract.revoke(Bid);
+  const tx = await contract.revokeCertificate(Bid);
   const receipt = await tx.wait();
   return receipt;
 }
