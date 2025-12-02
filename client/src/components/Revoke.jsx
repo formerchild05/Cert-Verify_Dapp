@@ -38,27 +38,32 @@ export default function RevokeCertificate() {
     };
 
     return (
-        <div>
-            <h2>Revoke Certificate</h2>
-            <input
-                type="text"
-                placeholder="Enter Certificate ID"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-            />
-            <button onClick={handleRevoke}>Revoke</button>
+        <div className="section-card">
+            <h2 className="section-title">Revoke Certificate</h2>
+            <div className="form-row">
+                <div className="input-group">
+                    <label>Certificate ID</label>
+                    <input
+                        type="text"
+                        placeholder="Enter Certificate ID"
+                        value={id}
+                        onChange={(e) => setId(e.target.value)}
+                    />
+                </div>
+            </div>
+            <div className="actions">
+                <button className="btn-danger" onClick={handleRevoke}>Revoke</button>
+            </div>
 
-            <p style={{
-                marginTop: 12,
-                fontWeight: 600,
-                color:
-                    status?.type === 'success' ? '#15803d' :
-                    status?.type === 'warning' ? '#b45309' :
-                    status?.type === 'error' ? '#b91c1c' : '#374151'
-            }}>
-                {status?.text || ''}
-            </p>
-
+            {status && (
+                <div className={`status-banner ${
+                    status?.type === 'success' ? 'status-success' :
+                    status?.type === 'warning' ? 'status-warning' :
+                    status?.type === 'error' ? 'status-error' : ''
+                }`}>
+                    {status?.text || ''}
+                </div>
+            )}
         </div>
     );
 }

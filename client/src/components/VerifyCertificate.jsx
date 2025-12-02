@@ -31,25 +31,35 @@ export default function VerifyCertificate() {
   }
 
   return (
-    <div>
-      <h2>Verify Certificate</h2>
-      <input type="text" placeholder="Enter Certificate ID"
-        onChange={(e) => setId(e.target.value)} />
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-
-      <button onClick={Verify}>Verify</button>
-
-        <div>
-          {result !== null && (result
-              ? <p style={{ color: "green" }}>Certificate is VERIFIED!</p>
-              : <p style={{ color: "red" }}>Certificate is NOT VERIFIED!</p>
-          )}
+    <div className="section-card">
+      <h2 className="section-title">Verify Certificate</h2>
+      <div className="form-row">
+        <div className="input-group">
+          <label>Certificate ID</label>
+          <input type="text" placeholder="Enter Certificate ID"
+            onChange={(e) => setId(e.target.value)} />
         </div>
-        {certUrl && (
-          <div>
-            <a href={certUrl} target="_blank" rel="noopener noreferrer">View Certificate PDF</a>
-          </div>
-        )}
+        <div className="input-group">
+          <label>Upload Certificate PDF</label>
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        </div>
+      </div>
+
+      <div className="actions">
+        <button onClick={Verify} className="btn-secondary">Verify</button>
+      </div>
+
+      {result !== null && (
+        <div className={`status-banner ${result ? 'status-success' : 'status-error'}`}>
+          {result ? 'Certificate is VERIFIED!' : 'Certificate is NOT VERIFIED!'}
+        </div>
+      )}
+
+      {certUrl && (
+        <div style={{ marginTop: '.5rem' }}>
+          <a href={certUrl} target="_blank" rel="noopener noreferrer">View Certificate PDF</a>
+        </div>
+      )}
     </div>
   );
 }

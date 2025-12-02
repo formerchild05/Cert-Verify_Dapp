@@ -40,24 +40,42 @@ export default function Organization() {
         }
     };
     return (
-        <div>
-            <h2>add new candidate</h2>
-            <input type="text" value={candidate} onChange={(e) => setCandidate(e.target.value)} />
-            <button onClick={addCandidate}>Add Candidate</button>
-
-
-
-            <div>
-                <h3>Candidate belong to this organization</h3>
-                <ul>
-                    {orgUsers.map((user, index) => (
-                        <li key={index}>
-                            {user}
-                            <button onClick={() => revokeCandidate(user)}>Revoke</button>
-                        </li>
-                    ))}
-                </ul>
+        <div className="section-card">
+            <h2 className="section-title">Organization Members</h2>
+            <div className="form-row">
+                <div className="input-group">
+                    <label>Candidate Address</label>
+                    <input type="text" value={candidate} onChange={(e) => setCandidate(e.target.value)} />
+                </div>
             </div>
+            <div className="actions">
+                <button onClick={addCandidate}>Add Candidate</button>
+            </div>
+
+            <div className="divider" />
+            <h3 className="section-title">Candidates in this Organization</h3>
+            <ul style={{ listStyle: 'none', paddingLeft: 0, marginTop: '.25rem' }}>
+                {orgUsers.map((user, index) => (
+                    <li key={index} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.6rem 0.75rem',
+                        border: '1px solid rgba(148,163,184,0.3)',
+                        borderRadius: '0.75rem',
+                        marginBottom: '0.5rem',
+                        background: 'rgba(15,23,42,0.6)'
+                    }}>
+                        <span style={{ wordBreak: 'break-all' }}>{user}</span>
+                        <div className="actions">
+                            <button className="btn-danger" onClick={() => revokeCandidate(user)}>Revoke</button>
+                        </div>
+                    </li>
+                ))}
+                {orgUsers.length === 0 && (
+                    <li style={{ color: 'var(--text-secondary)' }}>No candidates yet.</li>
+                )}
+            </ul>
         </div>
     );
 }

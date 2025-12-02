@@ -68,7 +68,7 @@ function App() {
       </div>;
     } else if (role === 'issuer') {
       return <div>
-        <Link to="/issue"><button>Issue</button></Link>
+        <Link to="/certificate"><button>Issue</button></Link>
         <Link to="/verify"><button>Verify</button></Link>
         <Link to="/organization"><button>Organization</button></Link>
       </div>;
@@ -83,17 +83,22 @@ function App() {
     <Router>
       <div className="app-container">
         <nav className="navbar">
-          <h1 className="navbar-title">Blockchain Certificate DApp</h1>
+          <div className="brand">
+            <span className="brand-logo" aria-hidden>🛡️</span>
+            <h1 className="navbar-title">Blockchain Certificate DApp</h1>
+          </div>
           <div className="navbar-buttons">
-
-            {content()}
-
-            {/* Connect MetaMask button */}
-            <button onClick={connectWallet} className="connect-button">
-              {currentAccount
-                ? `Connected: ${shortAddress(currentAccount)}`
-                : "Connect Wallet"}
-            </button>
+            <div className="nav-group">
+              {content()}
+            </div>
+            <div className="wallet-area">
+              <span className={`role-badge role-${role}`}>{role}</span>
+              <button onClick={connectWallet} className="connect-button">
+                {currentAccount
+                  ? `Connected: ${shortAddress(currentAccount)}`
+                  : "Connect Wallet"}
+              </button>
+            </div>
           </div>
         </nav>
 

@@ -147,7 +147,8 @@ export default function CreateCertificate() {
       <label>CANDIDATE ID (Public Key)</label>
       <input type="text" value={candidateId} onChange={(e) => setCandidateId(e.target.value)} />
 
-      <button onClick={drawOnPdf} disabled={isLoading}>
+    
+      <button onClick={drawOnPdf} disabled={isLoading} style={{ marginTop: 12 }}>
         {isLoading ? 'Đang xử lý...' : 'Vẽ đè và Tải PDF'}
       </button>
 

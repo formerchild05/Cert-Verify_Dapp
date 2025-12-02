@@ -63,9 +63,11 @@ export default function FCerti() {
   };
 
   return (
-    <div>
-      <h2>My Certificates</h2>
-      <button onClick={check}>Load</button>
+    <div className="section-card">
+      <h2 className="section-title">My Certificates</h2>
+      <div className="actions">
+        <button onClick={check} className="btn-secondary">Load</button>
+      </div>
 
       {/* <ul>
         {certs.map((c, i) => (
