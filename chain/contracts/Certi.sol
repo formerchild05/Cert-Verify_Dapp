@@ -23,9 +23,7 @@ contract CertificateContract is Ownable {
     // Danh sách tổ chức được issue
     mapping(address => bool) public isIssuer;
     address[] public issuers;
-
-    // TODO : GET USERS MANAGED BY ORG, REVOKE USER, revoke cert,
-
+    
     // Danh sách user mà mỗi ORG quản lý
     mapping(address => mapping(address => bool)) public orgUsers; // kiem tra co thuoc org nao do hay k
     mapping(address => address[]) public orgUserList; // optional: lưu danh sách user của mỗi org
@@ -108,9 +106,9 @@ contract CertificateContract is Ownable {
     function revokeCertificate(bytes32 id) external {
         Certificate memory c = certificates[id];
 
-        // Chỉ người cấp hoặc admin
+        // Chỉ người cấp 
         require(
-            msg.sender == c.issuedBy || msg.sender == owner(),
+            msg.sender == c.issuedBy ,
             "Not authorized to revoke"
         );
 
